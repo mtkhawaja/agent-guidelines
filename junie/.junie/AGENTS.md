@@ -177,15 +177,63 @@ try(final var reader = Files.newBufferedReader(Path.of(""))){}
   behavior.
 - Test names must describe behavior, not implementation. Use the patterns `ShouldDoXWhenY`, `ShouldNotDoXWhenY`, or
   `ShouldDoXWhenYGivenZ` to express intent using a simplified given–when–then structure.
+
+```java
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class NotificationServiceTest {
+    @DisplayName("Should save published event When the producer publishes a new event")
+    @Test
+    void shouldSavePublishedEventWhenTheProducerPublishesANewEvent() {...}
+}
+```
+
 - Tests must be order-independent and parallel-safe. Do not share mutable state across tests, do not rely on execution
   order, and do not write tests that break under parallel execution.
 - Keep tests narrowly scoped. Each test should verify one behavior/rule; avoid “wide” tests that assert multiple
   unrelated outcomes.
 - Prefer parameterized tests for matrices and validation. Use @ParameterizedTest for input validation, edge cases, and
   scenario grids instead of duplicating test bodies.
+- Tests must not be bypassed. Tests must not be skipped, disabled, or commented out to make the build pass.
+
+#### Mockito Specific Guidelines
+
 - Avoid brittle mocks. Do not write tests that require deep stubbing or mock-heavy setups tied to implementation
   details; prefer fakes, real collaborators, or higher-level tests when mocks become intrusive.
-- Tests must not be bypassed. Tests must not be skipped, disabled, or commented out to make the build pass.
+- Don't call `MockitoAnnotations.openMocks(...)` and don't create mocks imperatively
+- Use JUnit Jupiter Mockito integration i.e., rely on `@ExtendWith(MockitoExtension.class)`
+- Avoid global stubbings and stub interactions only inside the test method that depends on them.
+- Prefer annotation-driven mocks (`@Mock`, `@Spy`, `@Captor`, `@InjectMocks`) e.g.
+
+```java
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class OrderServiceTest {
+    @Mock
+    OrderRepository repository;
+    @InjectMocks
+    OrderService service;
+}
+```
+
+- Use `@MockitoBean` when mocking Spring-managed beans and prefer `@MockitoBean` to `@MockBean` when both are available
+  e.g.
+
+```java
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class PaymentControllerTest {
+    @MockitoBean
+    PaymentService paymentService;
+}
+```
 
 ### Time Related
 
