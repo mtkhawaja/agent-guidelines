@@ -41,9 +41,16 @@ Agents are expected to follow these guidelines when responding.
 - Use Standard Libraries: Don’t reinvent the wheel. Use Java’s standard library and well-adopted utilities.
 - Prefer immutability by default. Declare variables, parameters, and fields as final unless the mutation is intentional
   and justified.
+- Prefer constructor-based initialization over setter or field-based initialization and Require all mandatory
+  dependencies via constructors.
+- Do not omit braces for single-line if, for, while, or else statements.
+- Use braces consistently to avoid ambiguity and accidental logic errors.
+- Import types at the class level.
+- Do not use member-level or static member imports unless strictly required.
 
 ### Logging
 
+- Add a logger if it does not exist and add appropriate logging statements.
 - Logging must not affect control flow or program behavior.
 - Use the project’s logging facade and defaults. Prefer SLF4J when available; otherwise use the project-standard
   logger (e.g., Log4j2). Do not introduce new logging frameworks.
@@ -173,10 +180,12 @@ try(final var reader = Files.newBufferedReader(Path.of(""))){}
 
 - Use JUnit Jupiter by default (JUnit5 or above) unless the repository explicitly uses something else.
 - Use AssertJ for assertions. Prefer AssertJ to JUnit assertions unless the project standard dictates otherwise.
-- Every test must have `@DisplayName`. Do not add tests without a human-readable `@DisplayName` that states the
-  behavior.
-- Test names must describe behavior, not implementation. Use the patterns `ShouldDoXWhenY`, `ShouldNotDoXWhenY`, or
-  `ShouldDoXWhenYGivenZ` to express intent using a simplified given–when–then structure.
+- Every test must declare a method-level `@DisplayName`.
+- Never use `@DisplayName` at the class level.
+- `@DisplayName` text must be human-readable (natural language, spaces between words).
+- The test method name must mirror the `@DisplayName` in camelCase.
+- Test names must describe behavior, not implementation.
+- Use behavior patterns: `shouldDoXWhenY`, `shouldNotDoXWhenYIsSomeCondition`, `shouldDoXWhenYGivenZ`.
 
 ```java
 import org.junit.jupiter.api.DisplayName;
